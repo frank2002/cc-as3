@@ -23,3 +23,4 @@ phases:
 artifacts:
   files:
     - search-photos.zip
+  base-directory: ./lambda/search-photos/
