@@ -24,4 +24,4 @@ phases:
 artifacts:
   files:
     - index-photos.zip
-  base-directory: ./lambda/index-photos/
+  base-directory: .
