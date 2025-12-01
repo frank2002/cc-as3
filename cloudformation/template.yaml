@@ -189,7 +189,7 @@ Resources:
   IndexPhotosFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: index-photos
+      FunctionName: index-photos-cfn
       Runtime: python3.11
       Handler: index.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -198,7 +198,6 @@ Resources:
       Environment:
         Variables:
           OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
-          AWS_REGION: !Ref AWS::Region
       Code:
         S3Bucket: !Ref LambdaCodeBucket
         S3Key: !Ref IndexPhotosCodeKey
@@ -216,7 +215,7 @@ Resources:
   SearchPhotosFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: search-photos
+      FunctionName: search-photos-cfn
       Runtime: python3.11
       Handler: index.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -225,7 +224,6 @@ Resources:
       Environment:
         Variables:
           OPENSEARCH_ENDPOINT: !Ref OpenSearchEndpoint
-          AWS_REGION: !Ref AWS::Region
           LEX_BOT_ID: !Ref LexBotId
           LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
           LEX_LOCALE_ID: en_US
