@@ -1,8 +1,8 @@
 // Configuration - UPDATED BY SCRIPT
 const CONFIG = {
-    API_ENDPOINT: 'https://x9tt0zrzx0.execute-api.us-east-1.amazonaws.com/prod',
-    API_KEY: 'LrFIQdIhETaq2ZWTjs0MjKpu3HAcA4g3tLc30hM0',
-    PHOTOS_BUCKET: 'photo-album-photos-1764482476'
+    API_ENDPOINT: 'YOUR_API_GATEWAY_ENDPOINT',
+    API_KEY: 'YOUR_API_KEY',
+    PHOTOS_BUCKET: 'YOUR_PHOTOS_BUCKET_NAME'
 };
 
 // DOM Elements
