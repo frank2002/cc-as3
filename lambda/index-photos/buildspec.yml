@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing dependencies..."
+      - pip install -r requirements.txt -t .
+
+  build:
+    commands:
+      - echo "Build started on `date`"
+      - echo "Packaging Lambda function..."
+      - zip -r index-photos.zip . -x "*.git*" "buildspec.yml"
+
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+      - echo "Updating Lambda function..."
+      - aws lambda update-function-code --function-name index-photos --zip-file fileb://index-photos.zip
+
+artifacts:
+  files:
+    - index-photos.zip

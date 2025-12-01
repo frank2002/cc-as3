@@ -1,0 +1,185 @@
+openapi: 3.0.1
+info:
+  title: AI Photo Search API
+  description: API for searching and uploading photos with AI-powered natural language search
+  version: 1.0.0
+
+servers:
+  - url: https://{apiId}.execute-api.{region}.amazonaws.com/{stage}
+    variables:
+      apiId:
+        default: your-api-id
+      region:
+        default: us-east-1
+      stage:
+        default: prod
+
+paths:
+  /search:
+    get:
+      summary: Search photos using natural language query
+      description: Search for photos using keywords or natural language queries
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query (e.g., "show me dogs", "cats and birds")
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful search
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          description: URL to the photo
+                        labels:
+                          type: array
+                          items:
+                            type: string
+                  keywords:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Bad request - missing query parameter
+        '500':
+          description: Internal server error
+      security:
+        - api_key: []
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: arn:aws:apigateway:{region}:lambda:path/2015-03-31/functions/arn:aws:lambda:{region}:{accountId}:function:search-photos/invocations
+        passthroughBehavior: when_no_match
+
+    options:
+      summary: CORS support
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+
+  /photos/{filename}:
+    put:
+      summary: Upload a photo
+      description: Upload a photo to S3 with optional custom labels
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: Filename for the uploaded photo
+          schema:
+            type: string
+        - name: x-amz-meta-customLabels
+          in: header
+          required: false
+          description: Comma-separated custom labels for the photo
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/gif:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Photo uploaded successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+      security:
+        - api_key: []
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: PUT
+        uri: arn:aws:apigateway:{region}:s3:path/{bucket}/{key}
+        credentials: arn:aws:iam::{accountId}:role/APIGatewayS3Role
+        requestParameters:
+          integration.request.path.bucket: method.request.path.bucket
+          integration.request.path.key: method.request.path.filename
+          integration.request.header.x-amz-meta-customLabels: method.request.header.x-amz-meta-customLabels
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: 200
+
+    options:
+      summary: CORS support
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'"
+              method.response.header.Access-Control-Allow-Methods: "'PUT,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: x-api-key
+      in: header

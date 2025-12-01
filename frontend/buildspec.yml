@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+
+  build:
+    commands:
+      - echo "Build started on `date`"
+      - echo "No build process needed for static website"
+
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+      - echo "Uploading to S3..."
+      - aws s3 sync . s3://${FRONTEND_BUCKET_NAME}/ --exclude ".git/*" --exclude "buildspec.yml"
+      - echo "Frontend deployed successfully"
+
+artifacts:
+  files:
+    - '**/*'
+  exclude-paths:
+    - .git/**/*
+    - buildspec.yml
