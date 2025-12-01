@@ -11,6 +11,12 @@ phases:
       - cd frontend
       - echo "No build process needed for static website"
 
+      - echo "Injecting API Key..."
+      - sed -i "s|YOUR_API_GATEWAY_ENDPOINT|${API_ENDPOINT}|g" app.js
+      - sed -i "s|YOUR_API_KEY|${API_KEY}|g" app.js
+      - sed -i "s|YOUR_PHOTOS_BUCKET_NAME|${PHOTOS_BUCKET}|g" app.js
+
+
   post_build:
     commands:
       - echo "Build completed on `date`"
