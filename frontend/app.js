@@ -1,8 +1,8 @@
-// Configuration - UPDATE THESE VALUES AFTER DEPLOYMENT
+// Configuration - UPDATED BY SCRIPT
 const CONFIG = {
-    API_ENDPOINT: 'YOUR_API_GATEWAY_ENDPOINT', // e.g., 'https://abc123.execute-api.us-east-1.amazonaws.com/prod'
-    API_KEY: 'YOUR_API_KEY', // Your API Gateway API Key
-    PHOTOS_BUCKET: 'YOUR_PHOTOS_BUCKET_NAME' // e.g., 'photo-album-photos-bucket'
+    API_ENDPOINT: 'https://x9tt0zrzx0.execute-api.us-east-1.amazonaws.com/prod',
+    API_KEY: 'LrFIQdIhETaq2ZWTjs0MjKpu3HAcA4g3tLc30hM0',
+    PHOTOS_BUCKET: 'photo-album-photos-1764482476'
 };
 
 // DOM Elements
@@ -39,6 +39,8 @@ async function handleSearch() {
     searchResults.innerHTML = '<div class="loading"><div class="spinner"></div><p>Searching...</p></div>';
 
     try {
+        console.log('Calling API:', `${CONFIG.API_ENDPOINT}/search?q=${query}`);
+
         // Call search API
         const response = await fetch(`${CONFIG.API_ENDPOINT}/search?q=${encodeURIComponent(query)}`, {
             method: 'GET',
@@ -48,11 +50,16 @@ async function handleSearch() {
             }
         });
 
+        console.log('Response status:', response.status);
+
         if (!response.ok) {
-            throw new Error(`Search failed: ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('API Error:', errorText);
+            throw new Error(`Search failed: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
+        console.log('Response data:', data);
         displaySearchResults(data.results || []);
 
     } catch (error) {
@@ -155,6 +162,8 @@ async function handleUpload() {
         const timestamp = Date.now();
         const filename = `${timestamp}-${file.name}`;
 
+        console.log('Uploading to:', `${CONFIG.API_ENDPOINT}/photos/${filename}`);
+
         // Prepare headers
         const headers = {
             'x-api-key': CONFIG.API_KEY,
@@ -164,6 +173,7 @@ async function handleUpload() {
         // Add custom labels header if provided
         if (customLabels) {
             headers['x-amz-meta-customLabels'] = customLabels;
+            console.log('Custom labels:', customLabels);
         }
 
         // Upload to S3 via API Gateway
@@ -173,8 +183,12 @@ async function handleUpload() {
             body: file
         });
 
+        console.log('Upload response status:', response.status);
+
         if (!response.ok) {
-            throw new Error(`Upload failed: ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('Upload error:', errorText);
+            throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
         }
 
         showUploadStatus('Photo uploaded successfully!', 'success');
@@ -218,6 +232,7 @@ function showMessage(container, message, type) {
 
 // Initialize
 console.log('Photo Album App Initialized');
-console.log('Please update CONFIG values in app.js with your API Gateway endpoint and API key');
-
-// Test Codepipeline integration
+console.log('Configuration:');
+console.log('- API Endpoint:', CONFIG.API_ENDPOINT);
+console.log('- Photos Bucket:', CONFIG.PHOTOS_BUCKET);
+console.log('- API Key:', CONFIG.API_KEY ? 'Set' : 'NOT SET');
