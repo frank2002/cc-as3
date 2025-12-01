@@ -3,6 +3,7 @@ import boto3
 import os
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
+import uuid
 
 # Initialize AWS clients
 lex_client = boto3.client('lexv2-runtime')
@@ -57,7 +58,7 @@ def disambiguate_query(query_text):
             botId=LEX_BOT_ID,
             botAliasId=LEX_BOT_ALIAS_ID,
             localeId=LEX_LOCALE_ID,
-            sessionId='search-session',
+            sessionId=str(uuid.uuid4()),
             text=query_text
         )
 
@@ -233,6 +234,3 @@ def lambda_handler(event, context):
                 'message': str(e)
             })
         }
-        
-        
-# Test pipeline

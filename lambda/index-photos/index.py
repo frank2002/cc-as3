@@ -147,5 +147,3 @@ def lambda_handler(event, context):
                 'error': str(e)
             })
         }
-
-# Test pipeline
