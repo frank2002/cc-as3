@@ -219,3 +219,5 @@ function showMessage(container, message, type) {
 // Initialize
 console.log('Photo Album App Initialized');
 console.log('Please update CONFIG values in app.js with your API Gateway endpoint and API key');
+
+// Test Codepipeline integration
